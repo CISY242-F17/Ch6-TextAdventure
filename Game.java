@@ -11,14 +11,20 @@
  *  rooms, creates the parser and starts the game.  It also evaluates and
  *  executes the commands that the parser returns.
  * 
- * @author  Michael Kölling and David J. Barnes
- * @version 2011.08.10
+ * @author  Darryl Hellams
+ * @version 2017.12.11
  */
+
+import java.util.Stack;
 
 public class Game 
 {
     private Parser parser;
     private Room currentRoom;
+    private Room lastRoom;
+    private int timer = 0;
+    private Room fail;
+    private Stack multiLastRooms = new Stack();
         
     /**
      * Create the game and initialise its internal map.
@@ -34,30 +40,128 @@ public class Game
      */
     private void createRooms()
     {
-        Room outside, theater, pub, lab, office;
+        Room DinningHall, MasterBedroom, library, basement, attic, laboratory, bathroom, parlor1,
+             parlor2, gallery, bedroom1, bar, outside, garage, GreenHouse, kitchen, ToolRoom, CentralHall,
+             StairCase, elevator, bedroom2, bedroom3, bedroom4, secret, balcony, fail;
       
         // create the rooms
-        outside = new Room("outside the main entrance of the university");
-        theater = new Room("in a lecture theater");
-        pub = new Room("in the campus pub");
-        lab = new Room("in a computing lab");
-        office = new Room("in the computing admin office");
+        outside = new Room("you are outside the main entrance of the mansion");
+        DinningHall = new Room("you have entered the room where dinner is served");
+        MasterBedroom = new Room("you have entered the bedroom of home owner");
+        library = new Room("you have entered the mansion's library");
+        basement = new Room("you have entered the basement");
+        attic = new Room("you have entered the attic");
+        laboratory = new Room("you have entered the mansion's secret laboratory");
+        bathroom = new Room("you have entered the the mansion's main bathroom");
+        parlor1 = new Room("you have entered the the 2nd floor living room of the mansion");
+        parlor2 = new Room("you have entered the the main living room of the mansion");
+        gallery = new Room("you have entered the art room of the mansion");
+        bedroom1 = new Room("in random bedroom");
+        bar = new Room("you have entered the mansion's bar room");
+        garage = new Room("you have entered the car garage");
+        GreenHouse = new Room("in mansion's green house");
+        kitchen = new Room("you have entered the kitchen");
+        ToolRoom = new Room("you have entered the room where home owner keeps tools");
+        CentralHall = new Room("you have entered the central hall");
+        StairCase = new Room("you have entered the main stair case");
+        elevator = new Room("you have entered the secret elevator in the green house");
+        bedroom2 = new Room("you have entered a bedroom on the 2nd floor");
+        bedroom3 = new Room("you have entered a bedroom on the 2nd floor");
+        bedroom4 = new Room("you have entered a bedroom on the 2nd floor");
+        secret = new Room("you have entered a secret room on the second floor");
+        balcony = new Room("you have entered the 2nd floor balcony");
+        fail = new Room("home owner has returned home and recaptured you");
         
         // initialise room exits
-        outside.setExit("east", theater);
-        outside.setExit("south", lab);
-        outside.setExit("west", pub);
+        outside.setExit("north", CentralHall);
 
-        theater.setExit("west", outside);
+        DinningHall.setExit("west", parlor1);
+        DinningHall.setExit("east", CentralHall);
+        DinningHall.setExit("north", bar);
 
-        pub.setExit("east", outside);
+        MasterBedroom.setExit("east", library);
+        MasterBedroom.setExit("west", bathroom);
+        MasterBedroom.setExit("north", balcony);
+        MasterBedroom.setExit("south", gallery);
 
-        lab.setExit("north", outside);
-        lab.setExit("east", office);
+        library.setExit("north", attic);
+        library.setExit("west", MasterBedroom);
+        library.setExit("south", parlor2);
 
-        office.setExit("west", lab);
-
-        currentRoom = outside;  // start game outside
+        basement.setExit("south", parlor1);
+        
+        attic.setExit("east", bedroom1);
+        attic.setExit("south", library);
+        
+        laboratory.setExit("north", elevator);
+        
+        bathroom.setExit("east", MasterBedroom);
+        
+        parlor1.setExit("north", basement);
+        parlor1.setExit("south", kitchen);
+        
+        gallery.setExit("north", MasterBedroom);
+        gallery.setExit("east", parlor2);
+        
+        bedroom1.setExit("west", attic);
+        
+        bar.setExit("south", DinningHall);
+        bar.setExit("north", bedroom2);
+        
+        garage.setExit("west", CentralHall);
+        
+        GreenHouse.setExit("north", ToolRoom);
+        GreenHouse.setExit("east", elevator);
+        GreenHouse.setExit("west", parlor2);
+        
+        kitchen.setExit("north", parlor1);
+        kitchen.setExit("east", DinningHall);
+        
+        ToolRoom.setExit("south", GreenHouse);
+        
+        parlor2.setExit("north", library);
+        parlor2.setExit("east", GreenHouse);
+        parlor2.setExit("west", gallery);
+        parlor2.setExit("south", StairCase);
+        parlor2.setExit("southeast", bedroom2);
+        
+        CentralHall.setExit("north", StairCase);
+        CentralHall.setExit("east", garage);
+        CentralHall.setExit("west", DinningHall);
+        CentralHall.setExit("south", outside);
+        
+        StairCase.setExit("south", CentralHall);
+        StairCase.setExit("east", parlor2);
+        StairCase.setExit("west", bar);
+        StairCase.setExit("southeast", bedroom2);
+        
+        elevator.setExit("west", GreenHouse);
+        elevator.setExit("south", laboratory);
+        
+        bedroom2.setExit("northwest", StairCase);
+        bedroom2.setExit("north", parlor2);
+        
+        bedroom3.setExit("south", bar);
+        bedroom3.setExit("west", bedroom4);
+        
+        bedroom4.setExit("north", secret);
+        bedroom4.setExit("south", bedroom3);
+        
+        secret.setExit("north", balcony);
+        secret.setExit("west", bedroom4);
+        secret.setExit("south", bedroom4);
+        
+        balcony.setExit("southwest", secret);
+        balcony.setExit("southeast", MasterBedroom);
+        
+        //Add items to rooms
+        
+        bedroom1.addItem(new Item ("bright lantern", 3.0));
+        kitchen.addItem(new Item ("bag of chips", 0.5));
+        MasterBedroom.addItem(new Item ("old journal", 1.0));
+        laboratory.addItem(new Item ("weird substance with a strong scent", 3.5));
+        
+        currentRoom = bedroom1;  // start game in random bedroom
     }
 
     /**
@@ -75,6 +179,13 @@ public class Game
             Command command = parser.getCommand();
             finished = processCommand(command);
         }
+        
+        if (timer > 20)
+        {
+            currentRoom = fail;
+            System.out.println(currentRoom.getLongDescription());
+            finished = true;
+        }
         System.out.println("Thank you for playing.  Good bye.");
     }
 
@@ -84,8 +195,8 @@ public class Game
     private void printWelcome()
     {
         System.out.println();
-        System.out.println("Welcome to the World of Zuul!");
-        System.out.println("World of Zuul is a new, incredibly boring adventure game.");
+        System.out.println("You have woken up in a mansion you have never seen before");
+        System.out.println("Search for a way out within the time limit.");
         System.out.println("Type '" + CommandWord.HELP + "' if you need help.");
         System.out.println();
         System.out.println(currentRoom.getLongDescription());
@@ -114,6 +225,18 @@ public class Game
             case GO:
                 goRoom(command);
                 break;
+                
+            case LOOK:
+                 look();
+                 break; 
+            
+            case GRAB:
+                 grab();
+                 break;
+                 
+            case BACK:
+                 back();
+                 break;
 
             case QUIT:
                 wantToQuit = quit(command);
@@ -131,11 +254,23 @@ public class Game
      */
     private void printHelp() 
     {
-        System.out.println("You are lost. You are alone. You wander");
-        System.out.println("around at the university.");
+        System.out.println("You have woken up in an unfamilar bedroom. Search around the mansion");
+        System.out.println("and look for a way out.");
         System.out.println();
         System.out.println("Your command words are:");
         parser.showCommands();
+    }
+    
+    //Allows player to view room and get long description
+    private void look()
+    {
+        System.out.println(currentRoom.getLongDescription());
+    }
+    
+    //Allows player to pick up an item
+    private void grab()
+    {
+        System.out.println("You have picked up the item");
     }
 
     /** 
@@ -156,10 +291,28 @@ public class Game
         Room nextRoom = currentRoom.getExit(direction);
 
         if (nextRoom == null) {
-            System.out.println("There is no door!");
+            System.out.println("There is no exit!");
         }
         else {
+            lastRoom = currentRoom;
+            multiLastRooms.push (lastRoom);
             currentRoom = nextRoom;
+            timer = timer + 1;
+            System.out.println(currentRoom.getLongDescription());
+        }
+    }
+    
+    //Allows player to go back to the room they were just in
+    private void back()
+    {
+        if (multiLastRooms.empty())
+        {
+            System.out.println("You wouldn't be lost right now if you had a good memory...");
+        }
+        else
+        {
+            currentRoom = (Room) multiLastRooms.pop();
+            System.out.println("You retraced your foot steps and found your way back to where you were.");
             System.out.println(currentRoom.getLongDescription());
         }
     }

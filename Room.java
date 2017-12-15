@@ -1,6 +1,7 @@
 import java.util.Set;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.HashSet;
 
 /**
  * Class Room - a room in an adventure game.
@@ -12,14 +13,15 @@ import java.util.Iterator;
  * connected to other rooms via exits.  For each existing exit, the room 
  * stores a reference to the neighboring room.
  * 
- * @author  Michael Kölling and David J. Barnes
- * @version 2011.08.10
+ * @author  Darryl Hellams
+ * @version 2017.12.11
  */
 
 public class Room 
 {
     private String description;
-    private HashMap<String, Room> exits;        // stores exits of this room.
+    private HashMap<String, Room> exits; // stores exits of this room.
+    private HashSet items;
 
     /**
      * Create a room described "description". Initially, it has
@@ -31,6 +33,7 @@ public class Room
     {
         this.description = description;
         exits = new HashMap<String, Room>();
+        items = new HashSet();
     }
 
     /**
@@ -60,9 +63,25 @@ public class Room
      */
     public String getLongDescription()
     {
-        return "You are " + description + ".\n" + getExitString();
+        return "You are " + description + ".\n" + getExitString() + "\n" + getItemString();
     }
-
+    
+    //Code to add items to rooms
+    public void addItem(Item item)
+    {
+        items.add(item);
+    }
+    
+    //Return a string describing items in a room
+    private String getItemString()
+    {
+        String returnString = "Items:";
+        for(Iterator it = items.iterator(); it.hasNext(); )
+            returnString += " " + ((Item) it.next()).getDescription();
+            
+            return returnString;
+    }
+    
     /**
      * Return a string describing the room's exits, for example
      * "Exits: north west".
